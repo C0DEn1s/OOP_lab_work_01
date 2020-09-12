@@ -36,9 +36,5 @@ void TextEditOperation::setText(const string& s) {
 }
 
 void TextEditOperation::setPosition(const unsigned int& pos) {
-    if (pos < text.size()) {
-        position = pos;
-    } else {
-        throw invalid_argument("Invalid position for the text");
-    }
+    position = pos;
 }
