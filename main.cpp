@@ -1,3 +1,4 @@
+#include "text_editor.h"
 #include <iostream>
 
 int main() {
