@@ -1,5 +1,4 @@
 #include "text_editor.h"
-#include <stdexcept>
 
 TextEditOperation::TextEditOperation() {
 
