@@ -13,7 +13,7 @@ using namespace std;
 class TextEditOperation {
 public:
     TextEditOperation();
-    TextEditOperation(const Operation& op, const string& s, const int& pos);
+    TextEditOperation(const Operation& op, const string& s, const unsigned int& pos);
     TextEditOperation(const TextEditOperation& copy_class);
 
     Operation getOperation() const;
@@ -22,13 +22,13 @@ public:
     string getText() const;
     void setText(const string& s);
 
-    int getPosition() const;
-    void setPosition(const int& pos);
+    unsigned int getPosition() const;
+    void setPosition(const unsigned int& pos);
 
 private:
     Operation operation;
     string text;
-    int position;
+    unsigned int position;
 };
 
 #endif //LAB_WORK_01_TEXT_EDITOR_H
