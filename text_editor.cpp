@@ -14,26 +14,26 @@ TextEditOperation::TextEditOperation(const TextEditOperation& copy_class)
                                   text(copy_class.text),
                                   position(copy_class.position) {}
 
-string TextEditOperation::GetText() const {
+string TextEditOperation::getText() const {
     return text;
 }
 
-Operation TextEditOperation::GetOperation() const {
+Operation TextEditOperation::getOperation() const {
     return operation;
 }
 
-int TextEditOperation::GetPosition() const {
+int TextEditOperation::getPosition() const {
     return position;
 }
 
-void TextEditOperation::SetOperation(const Operation &op) {
+void TextEditOperation::setOperation(const Operation &op) {
     operation = op;
 }
 
-void TextEditOperation::SetText(const string &s) {
+void TextEditOperation::setText(const string &s) {
     text = s;
 }
 
-void TextEditOperation::SetPosition(const int &pos) {
+void TextEditOperation::setPosition(const int &pos) {
     position = pos;
 }

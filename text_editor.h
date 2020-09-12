@@ -16,14 +16,14 @@ public:
     TextEditOperation(const Operation& op, const string& s, const int& pos);
     TextEditOperation(const TextEditOperation& copy_class);
 
-    Operation GetOperation() const;
-    void SetOperation(const Operation& op);
+    Operation getOperation() const;
+    void setOperation(const Operation& op);
 
-    string GetText() const;
-    void SetText(const string& s);
+    string getText() const;
+    void setText(const string& s);
 
-    int GetPosition() const;
-    void SetPosition(const int& pos);
+    int getPosition() const;
+    void setPosition(const int& pos);
 
 private:
     Operation operation;
