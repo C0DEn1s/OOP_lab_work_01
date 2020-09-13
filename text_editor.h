@@ -19,7 +19,7 @@ public:
     Operation getOperation() const;
     void setOperation(const Operation& op);
 
-    string getText() const;
+    const string& getText() const;
     void setText(const string& s);
 
     unsigned int getPosition() const;

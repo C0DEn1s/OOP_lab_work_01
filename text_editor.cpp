@@ -14,7 +14,7 @@ TextEditOperation::TextEditOperation(const TextEditOperation& copy_class)
                                   text(copy_class.text),
                                   position(copy_class.position) {}
 
-string TextEditOperation::getText() const {
+const string& TextEditOperation::getText() const {
     return text;
 }
 
