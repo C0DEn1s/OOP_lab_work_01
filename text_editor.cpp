@@ -1,18 +1,17 @@
 #include "text_editor.h"
 
-TextEditOperation::TextEditOperation() {
+#include <utility>
 
-}
+using namespace std;
 
-TextEditOperation::TextEditOperation(const Operation& op, const string& s, const unsigned int& pos)
-                                : operation(op),
-                                  text(s),
+TextEditOperation::TextEditOperation() = default;
+
+TextEditOperation::TextEditOperation(const string& op, string s, const unsigned int& pos)
+                                : operation(recognizeOperation(op)),
+                                  text(move(s)),
                                   position(pos) {}
 
-TextEditOperation::TextEditOperation(const TextEditOperation& copy_class)
-                                : operation(copy_class.operation),
-                                  text(copy_class.text),
-                                  position(copy_class.position) {}
+TextEditOperation::TextEditOperation(const TextEditOperation& copy_class) = default;
 
 const string& TextEditOperation::getText() const {
     return text;
@@ -26,8 +25,8 @@ unsigned int TextEditOperation::getPosition() const {
     return position;
 }
 
-void TextEditOperation::setOperation(const Operation& op) {
-    operation = op;
+void TextEditOperation::setOperation(const string& op) {
+    operation = recognizeOperation(op);
 }
 
 void TextEditOperation::setText(const string& s) {
@@ -36,4 +35,13 @@ void TextEditOperation::setText(const string& s) {
 
 void TextEditOperation::setPosition(const unsigned int& pos) {
     position = pos;
+}
+
+Operation recognizeOperation(const string& s) {
+    if (s == "INSERT") {
+        return Operation::Insert;
+    } else if (s == "DELETE") {
+        return Operation::Delete;
+    }
+    return Operation::NoAction;
 }
