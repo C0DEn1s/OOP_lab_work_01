@@ -6,7 +6,16 @@
 using namespace std;
 
 template <typename T>
+class Stack;
+
+template <typename T>
 class NodeStack {
+public:
+    friend Stack<T>;
+    const T& operator*() {
+        return data;
+    }
+private:
     T data;
     NodeStack<T>* next;
 };
@@ -19,13 +28,14 @@ public:
     ~Stack();
 
     void push(const T& data);
-    T pop();
+    void pop();
     void clear();
+    bool empty();
     [[nodiscard]] unsigned int size() const;
-    NodeStack<T>* getTop() const;
-
+    NodeStack<T> getTop() const;
 private:
-    NodeStack<T>* pTop;  //
+    NodeStack<T>* pTop;
+    unsigned size_ = 0;
 };
 
 template <typename T>
@@ -57,6 +67,7 @@ Stack<T>::Stack(const Stack<T>& other_stack) {
 
         p = p->next;
     }
+    size_ = other_stack.size_;
 }
 
 
@@ -74,22 +85,20 @@ void Stack<T>::push(const T& data) {
     p->next = pTop;
 
     pTop = p;
+    ++size_;
 }
 
 template<typename T>
-T Stack<T>::pop() {
+void Stack<T>::pop() {
     if (pTop == nullptr) {
         cout << "Stack is empty.\n";
         return;
     }
     NodeStack<T>* temp;
-    T data = pTop->data;
-
     temp = pTop;
     pTop = pTop->next;
     delete temp;
-
-    return data;
+    --size_;
 }
 
 template <typename T>
@@ -104,26 +113,27 @@ void Stack<T>::clear() {
         delete temp;
     }
     pTop = nullptr;
+    size_ = 0;
 }
 
 template<typename T>
 unsigned int Stack<T>::size() const {
-    if (pTop == nullptr) {
-        return 0;
-    } else {
-        NodeStack<T>* p;
-        unsigned int count = 0;
-        while (p != nullptr) {
-            count++;
-            p = p->next;
-        }
+    return size_;
+}
+
+template <typename T>
+bool Stack<T>::empty() {
+    if (size_ == 0)  {
+        return true;
     }
+    return false;
 }
 
 template<typename T>
-NodeStack<T>* Stack<T>::getTop() const {
-    return pTop;
+NodeStack<T> Stack<T>::getTop() const {
+    return *pTop;
 }
+
 
 template<typename T>
 void printStack(const Stack<T>& stack) {
@@ -133,7 +143,7 @@ void printStack(const Stack<T>& stack) {
         NodeStack<T>* p;
         p = stack.getTop();
         while (p != nullptr) {
-            cout << p->data << '|';
+            cout << p->data << "\n";
             p = p->next;
         }
         cout << '\n';
