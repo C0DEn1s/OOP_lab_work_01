@@ -110,6 +110,7 @@ void TestHistoryContainer() {
 
     history.insert("o, world!", 4);
     assert(history.empty_s());
+    assert(history.size() == 3);
 
     std::cerr << "TestHistoryContainer Test OK" << std::endl;
 }
