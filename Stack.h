@@ -1,5 +1,7 @@
 #ifndef LAB_WORK_01_STACK_H
 #define LAB_WORK_01_STACK_H
+
+#include "history_revisions.h"
 #include <iostream>
 #include <iomanip>
 
@@ -8,11 +10,14 @@ using namespace std;
 template <typename T>
 class Stack;
 
+class EditHistory;
+
 template <typename T>
-class NodeStack {
+class NodeStack : public error_code {
 public:
     friend Stack<T>;
-    const T& operator*() {
+    friend EditHistory;
+    T operator*() {
         return data;
     }
 private:
@@ -73,6 +78,7 @@ Stack<T>::Stack(const Stack<T>& other_stack) {
 
 template<typename T>
 Stack<T>::~Stack() {
+    std::cerr << "~stack" << endl;
     clear();
 }
 
