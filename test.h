@@ -4,8 +4,7 @@
 void TestEditorCtor();
 void TestEditorAccess();
 
-void TestHistoryCtor();
-void TestHistoryAccess();
+void TestHistoryContainer();
 
 void TestStack();
 

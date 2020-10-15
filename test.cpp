@@ -7,7 +7,7 @@
 void TestEditorCtor() {
     TextEditOperation defCtor;
     assert(defCtor.getOperation() == Operation::NoAction &&
-           defCtor.getText() == "" &&
+           defCtor.getText().empty() &&
            defCtor.getPosition() == 0);
 
     TextEditOperation parCtor("INSERT", "Hello!", 3);
@@ -15,7 +15,7 @@ void TestEditorCtor() {
            parCtor.getText() == "Hello!" &&
            parCtor.getPosition() == 3);
 
-    TextEditOperation copyCtor = parCtor;
+    const TextEditOperation& copyCtor = parCtor;
     assert(copyCtor.getOperation() == parCtor.getOperation() &&
            copyCtor.getText() == parCtor.getText() &&
            copyCtor.getPosition() == parCtor.getPosition());
@@ -41,9 +41,6 @@ void TestEditorAccess() {
     std::cerr << "TextEditor Access Test OK" << std::endl;
 }
 
-void TestHistoryCtor();
-void TestHistoryAccess();
-
 void TestStack() {
     Stack<int> stack;
     assert(stack.empty());
@@ -66,12 +63,38 @@ void TestStack() {
 
     stack.clear();
     assert(stack.empty());
-    std::cerr << "Satck Test is OK" << std::endl;
+    std::cerr << "Stack Test is OK" << std::endl;
+}
+
+void TestHistoryContainer() {
+    EditHistory history;
+    assert(history.empty_f());
+    //assert(history.empty_s());
+
+//    history.insert("Hello, ", 0);
+//    assert(history.size() == 1);
+//    auto temp = *(history.getTopFirst());
+//    assert(temp.getText() == "Hello, ");
+
+//    Stack<TextEditOperation> f;
+//    f.push({"INSERT", "Text", 0});
+//    f.push({"INSERT", "Text2", 4});
+//
+//    Stack<TextEditOperation> s;
+//    s.push({"INSERT", "Text3", 0});
+//    s.push({"INSERT", "Text4", 5});
+//
+//    EditHistory stack(f, s, false);
+//    assert(stack.size() == 4);
+
+
+    std::cerr << "TestHistoryContainer Test is OK" << std::endl;
 }
 
 void Test() {
     TestEditorCtor();
     TestEditorAccess();
     TestStack();
+    TestHistoryContainer();
     std::cerr << "All Tests OK" << std::endl;
 }
