@@ -12,7 +12,6 @@ enum class Operation {
 class TextEditOperation {
 public:
     TextEditOperation();
-
     TextEditOperation(const std::string& op, std::string s, const unsigned int& pos);
     TextEditOperation(const TextEditOperation& copy_class);
 
