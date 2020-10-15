@@ -63,32 +63,55 @@ void TestStack() {
 
     stack.clear();
     assert(stack.empty());
-    std::cerr << "Stack Test is OK" << std::endl;
+    std::cerr << "Stack Test OK" << std::endl;
 }
 
 void TestHistoryContainer() {
     EditHistory history;
     assert(history.empty_f());
-    //assert(history.empty_s());
+    assert(history.empty_s());
 
-//    history.insert("Hello, ", 0);
-//    assert(history.size() == 1);
-//    auto temp = *(history.getTopFirst());
-//    assert(temp.getText() == "Hello, ");
+    history.insert("Hello, ", 0);
+    assert(history.size() == 1);
+    auto temp = *(history.getTopFirst());
+    string bottom = temp.getText();   // first element
+    assert(bottom == "Hello, ");
 
-//    Stack<TextEditOperation> f;
-//    f.push({"INSERT", "Text", 0});
-//    f.push({"INSERT", "Text2", 4});
-//
-//    Stack<TextEditOperation> s;
-//    s.push({"INSERT", "Text3", 0});
-//    s.push({"INSERT", "Text4", 5});
-//
-//    EditHistory stack(f, s, false);
-//    assert(stack.size() == 4);
+    history.erase("o, ", 4);
+    assert(history.size() == 2);
 
+    Stack<TextEditOperation> f;
+    f.push({"INSERT", "Text", 0});
+    f.push({"INSERT", "Text2", 4});
 
-    std::cerr << "TestHistoryContainer Test is OK" << std::endl;
+    Stack<TextEditOperation> s;
+    s.push({"INSERT", "Text3", 0});
+    s.push({"INSERT", "Text4", 5});
+
+    EditHistory stack(f, s, false);
+    assert(stack.size() == 4);
+
+    stack.~EditHistory();
+    assert(stack.empty_f());
+    assert(stack.empty_s());
+
+    EditHistory copy = history;
+    assert(copy.size() == history.size());
+    temp = *(copy.getTopFirst());
+    assert(temp.getText() == "o, ");
+
+    history.undo();
+    temp = *(history.getTopSecond());
+    assert(temp.getText() == bottom);
+
+    history.redo();
+    temp = *(history.getTopFirst());
+    assert(temp.getText() == "o, ");
+
+    history.insert("o, world!", 4);
+    assert(history.empty_s());
+
+    std::cerr << "TestHistoryContainer Test OK" << std::endl;
 }
 
 void Test() {
