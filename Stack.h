@@ -13,7 +13,7 @@ class Stack;
 class EditHistory;
 
 template <typename T>
-class NodeStack : public error_code {
+class NodeStack {
 public:
     friend Stack<T>;
     friend EditHistory;
@@ -78,7 +78,6 @@ Stack<T>::Stack(const Stack<T>& other_stack) {
 
 template<typename T>
 Stack<T>::~Stack() {
-    std::cerr << "~stack" << endl;
     clear();
 }
 
@@ -129,10 +128,7 @@ unsigned int Stack<T>::size() const {
 
 template <typename T>
 bool Stack<T>::empty() {
-    if (size_ == 0)  {
-        return true;
-    }
-    return false;
+    return size_ == 0;
 }
 
 template<typename T>
