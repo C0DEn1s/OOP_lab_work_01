@@ -13,7 +13,7 @@ public:
     EditHistory(const Stack<TextEditOperation>& f, const Stack<TextEditOperation>& s, bool flag);
     EditHistory(const EditHistory& other);
 
-    [[noreturn]] ~EditHistory();
+    ~EditHistory();
 
     void insert(std::string s, unsigned pos);
     void erase(std::string s, unsigned pos);

@@ -15,13 +15,12 @@ EditHistory::EditHistory(const EditHistory& other)
                           second(other.second),
                           was_undo(other.was_undo) {}
 
-EditHistory::~EditHistory() {
-    std::cerr << "~edithistory" << endl;
-}
+EditHistory::~EditHistory() = default;
 
 void EditHistory::insert(string s, unsigned pos) {
     if (was_undo) {
         second.clear();
+        was_undo = false;
     }
     TextEditOperation in("INSERT", std::move(s), pos);
     first.push(in);
@@ -30,6 +29,7 @@ void EditHistory::insert(string s, unsigned pos) {
 void EditHistory::erase(string s, unsigned pos) {
     if (was_undo) {
         second.clear();
+        was_undo = false;
     }
     TextEditOperation in("DELETE", std::move(s), pos);
     first.push(in);
@@ -37,7 +37,8 @@ void EditHistory::erase(string s, unsigned pos) {
 
 void EditHistory::undo() {
     NodeStack<TextEditOperation> p;
-    while (first.getTop()) {
+    size_t length = first.size();
+    for (size_t i = 0; i < length; ++i) {
         p = first.getTop();
         second.push(*p);
         first.pop();
@@ -46,7 +47,8 @@ void EditHistory::undo() {
 }
 void EditHistory::redo() {
     NodeStack<TextEditOperation> p;
-    while (second.getTop()) {
+    size_t length = second.size();
+    for (size_t i = 0; i < length; ++i) {
         p = second.getTop();
         first.push(*p);
         second.pop();
