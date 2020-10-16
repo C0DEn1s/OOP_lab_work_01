@@ -52,7 +52,7 @@ public:
     Stack(const Stack<T>& stack);
     Stack& operator=(const Stack& other);
     Stack(Stack<T>&& stack) noexcept;
-    Stack& operator=(const Stack&& other) noexcept;
+    Stack& operator=(Stack&& other) noexcept;
     ~Stack();
 
     void push(const T& data);
@@ -178,7 +178,8 @@ const T& Stack<T>::getTop() const {
 
 template<typename T>
 T& Stack<T>::getTop() {
-    return const_cast<T&>(const_cast<Stack<T>&>(*this).getTop());
+//    return const_cast<T&>(const_cast<Stack<T>&>(*this).getTop());
+    return pTop->data;
 }
 
 template<typename T>
@@ -198,22 +199,27 @@ void printStack(const Stack<T>& stack) {
 
 template<typename T>
 Stack<T>& Stack<T>::operator=(const Stack& other) {
-//    NodeStack<T>* tmp = other.pTop;
-//    NodeStack<T>* p = pTop;
+    NodeStack<T>* tmp = other.pTop;
+    Stack<T> add;
+    for (size_t i = 0; i < other.size_; ++i) {
+        add.push(tmp->data);
+        tmp = tmp->next;
+    }
     clear();
-//    for (size_t i = 0; i < other.size_; ++i) {
-//        push(tmp->data);
-//        p = p->next;
-//        tmp = tmp->next;
-//    }
-//    this->size_ = other.size_;
-//    return *this;
-
+    tmp = add.pTop;
+    for (size_t i = 0; i < other.size_; ++i) {
+        push(tmp->data);
+        tmp = tmp->next;
+    }
+    this->size_ = other.size_;
+    return *this;
 }
 
 template<typename T>
-Stack<T>& Stack<T>::operator=(const Stack&& other) noexcept {
-    *this = other;
+Stack<T>& Stack<T>::operator=(Stack&& other) noexcept {
+    this->pTop = other.pTop;
+    other.pTop = nullptr;
+    this->size_ = other.size_;
     return *this;
 }
 
