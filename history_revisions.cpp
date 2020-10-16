@@ -39,18 +39,17 @@ void EditHistory::undo() {
     NodeStack<TextEditOperation> p;
     size_t length = first.size();
     for (size_t i = 0; i < length; ++i) {
-        p = first.getTop();
-        second.push(*p);
+        second.emplace(std::move(first.getTop()));
         first.pop();
     }
     was_undo = true;
 }
+
 void EditHistory::redo() {
     NodeStack<TextEditOperation> p;
     size_t length = second.size();
     for (size_t i = 0; i < length; ++i) {
-        p = second.getTop();
-        first.push(*p);
+        first.emplace(std::move(second.getTop()));
         second.pop();
     }
     was_undo = true;
@@ -60,12 +59,20 @@ unsigned int EditHistory::size() const {
     return first.size() + second.size();
 }
 
-NodeStack<TextEditOperation> EditHistory::getTopFirst() const {
+const TextEditOperation& EditHistory::getTopFirst() const {
     return first.getTop();
 }
 
-NodeStack<TextEditOperation> EditHistory::getTopSecond() const {
+TextEditOperation& EditHistory::getTopFirst() {
+    return const_cast<TextEditOperation&>(const_cast<const EditHistory&>(*this).getTopFirst());  // first.getTop();
+}
+
+const TextEditOperation& EditHistory::getTopSecond() const {
     return second.getTop();
+}
+
+TextEditOperation& EditHistory::getTopSecond() {
+    return const_cast<TextEditOperation&>(const_cast<const EditHistory&>(*this).getTopSecond());  // second.getTop();
 }
 
 bool EditHistory::empty_f() {

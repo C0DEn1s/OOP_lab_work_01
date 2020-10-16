@@ -23,8 +23,10 @@ public:
     bool empty_f();
     bool empty_s();
     [[nodiscard]] unsigned int size() const;
-    [[nodiscard]] NodeStack<TextEditOperation> getTopFirst() const;
-    [[nodiscard]] NodeStack<TextEditOperation> getTopSecond() const;
+    [[nodiscard]] const TextEditOperation& getTopFirst() const;
+    [[nodiscard]] TextEditOperation& getTopFirst();
+    [[nodiscard]] const TextEditOperation& getTopSecond() const;
+    [[nodiscard]] TextEditOperation& getTopSecond();
 private:
     Stack<TextEditOperation> first;
     Stack<TextEditOperation> second;
