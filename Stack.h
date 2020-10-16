@@ -18,9 +18,8 @@ public:
     NodeStack() = default;
     bool operator==(const NodeStack<T>& rhs) const;
     bool operator!=(const NodeStack<T>& rhs) const;
-    explicit NodeStack(const T& new_value)
-                        : data(new_value) {}
-
+    explicit NodeStack(const T& new_value) = delete;
+    NodeStack<T>& operator=(const NodeStack& other) = delete;
     explicit NodeStack(T&& new_value)
                         : data(move(new_value)) {}
 
@@ -37,12 +36,12 @@ T NodeStack<T>::operator*() {
 }
 
 template<class T>
-bool NodeStack<T>::operator==(const NodeStack<T> &rhs) const {
+bool NodeStack<T>::operator==(const NodeStack<T>& rhs) const {
     return data == rhs.data;
 }
 
 template<class T>
-bool NodeStack<T>::operator!=(const NodeStack<T> &rhs) const {
+bool NodeStack<T>::operator!=(const NodeStack<T>& rhs) const {
     return data != rhs.data;
 }
 
@@ -57,11 +56,13 @@ public:
     ~Stack();
 
     void push(const T& data);
+    void emplace(T&& data);
     void pop();
     void clear();
     bool empty();
     [[nodiscard]] unsigned int size() const;
-    NodeStack<T> getTop() const;
+    const T& getTop() const;
+    T& getTop();
 private:
     NodeStack<T>* pTop = nullptr;
     unsigned size_ = 0;
@@ -99,7 +100,7 @@ Stack<T>::Stack(const Stack<T>& other_stack) {
 template<typename T>
 Stack<T>::Stack(Stack<T>&& stack) noexcept {
     for (NodeStack<T>* tmp = stack.pTop; tmp != nullptr; tmp = tmp->next) {
-        push(move(tmp->data));
+        emplace(std::move(tmp->data));
     }
 }
 
@@ -114,6 +115,18 @@ void Stack<T>::push(const T& data) {
     p = new NodeStack<T>;
 
     p->data = data;
+    p->next = pTop;
+
+    pTop = p;
+    ++size_;
+}
+
+template <typename T>
+void Stack<T>::emplace(T&& data) {
+    NodeStack<T>* p;
+    p = new NodeStack<T>;
+
+    p->data = std::move(data);
     p->next = pTop;
 
     pTop = p;
@@ -159,8 +172,13 @@ bool Stack<T>::empty() {
 }
 
 template<typename T>
-NodeStack<T> Stack<T>::getTop() const {
-    return *pTop;
+const T& Stack<T>::getTop() const {
+    return pTop->data;
+}
+
+template<typename T>
+T& Stack<T>::getTop() {
+    return const_cast<T&>(const_cast<Stack<T>&>(*this).getTop());
 }
 
 template<typename T>
@@ -180,17 +198,17 @@ void printStack(const Stack<T>& stack) {
 
 template<typename T>
 Stack<T>& Stack<T>::operator=(const Stack& other) {
-    *this(other);
-    return *this;
 //    NodeStack<T>* tmp = other.pTop;
 //    NodeStack<T>* p = pTop;
+    clear();
 //    for (size_t i = 0; i < other.size_; ++i) {
-//        p->data = tmp->data;
+//        push(tmp->data);
 //        p = p->next;
 //        tmp = tmp->next;
 //    }
 //    this->size_ = other.size_;
 //    return *this;
+
 }
 
 template<typename T>
