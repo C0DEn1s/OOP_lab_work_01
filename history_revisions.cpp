@@ -17,7 +17,7 @@ EditHistory::EditHistory(const EditHistory& other)
 
 EditHistory::~EditHistory() = default;
 
-void EditHistory::insert(string s, unsigned pos) {
+void EditHistory::insert(std::string s, unsigned pos) {
     if (was_undo) {
         second.clear();
         was_undo = false;
@@ -26,7 +26,7 @@ void EditHistory::insert(string s, unsigned pos) {
     first.push(in);
 }
 
-void EditHistory::erase(string s, unsigned pos) {
+void EditHistory::erase(std::string s, unsigned pos) {
     if (was_undo) {
         second.clear();
         was_undo = false;
