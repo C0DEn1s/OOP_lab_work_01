@@ -63,6 +63,18 @@ void TestStack() {
 
     stack.clear();
     assert(stack.empty());
+
+    Stack<int> s1;
+    s1.push(10);
+    s1.push(20);
+    Stack<int> s2;
+    s2.push(30);
+    s2 = s1;
+    assert(*s2.getTop() == 20);
+    assert(s2.size() == 2);
+    s1.clear();
+    s2.pop();
+
     std::cerr << "Stack Test OK" << std::endl;
 }
 
@@ -74,7 +86,7 @@ void TestHistoryContainer() {
     history.insert("Hello, ", 0);
     assert(history.size() == 1);
     auto temp = *(history.getTopFirst());
-    string bottom = temp.getText();   // first element
+    std::string bottom = temp.getText();   // first element
     assert(bottom == "Hello, ");
 
     history.erase("o, ", 4);
