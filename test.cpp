@@ -50,15 +50,15 @@ void TestStack() {
     stack.push(3);
     stack.push(4);
 
-    assert(*stack.getTop() == 4);
+    assert(stack.getTop() == 4);
     assert(stack.size() == 4);
 
     stack.pop();
-    assert(*stack.getTop() == 3);
+    assert(stack.getTop() == 3);
     assert(stack.size() == 3);
 
     Stack<int> copy = stack;
-    assert(*copy.getTop() == *stack.getTop());
+    assert(copy.getTop() == stack.getTop());
     assert(copy.size() == stack.size());
 
     stack.clear();
@@ -70,7 +70,7 @@ void TestStack() {
     Stack<int> s2;
     s2.push(30);
     s2 = s1;
-    assert(*s2.getTop() == 20);
+    assert(s2.getTop() == 20);
     assert(s2.size() == 2);
     s1.clear();
     s2.pop();
@@ -85,7 +85,7 @@ void TestHistoryContainer() {
 
     history.insert("Hello, ", 0);
     assert(history.size() == 1);
-    auto temp = *(history.getTopFirst());
+    auto temp = (history.getTopFirst());
     std::string bottom = temp.getText();   // first element
     assert(bottom == "Hello, ");
 
@@ -109,15 +109,15 @@ void TestHistoryContainer() {
 
     EditHistory copy = history;
     assert(copy.size() == history.size());
-    temp = *(copy.getTopFirst());
+    temp = (copy.getTopFirst());
     assert(temp.getText() == "o, ");
 
     history.undo();
-    temp = *(history.getTopSecond());
+    temp = (history.getTopSecond());
     assert(temp.getText() == bottom);
 
     history.redo();
-    temp = *(history.getTopFirst());
+    temp = (history.getTopFirst());
     assert(temp.getText() == "o, ");
 
     history.insert("o, world!", 4);
