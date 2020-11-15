@@ -1,226 +1,147 @@
-#ifndef LAB_WORK_01_STACK_H
-#define LAB_WORK_01_STACK_H
+#ifndef STACK_H
+#define STACK_H
 
-#include "history_revisions.h"
-#include <iostream>
-#include <iomanip>
-#include <utility>
+#include <memory>
+#include <istream>
+#include <ostream>
 
-template <typename T>
-class Stack;
-class EditHistory;
-
-template <typename T>
-class NodeStack {
-public:
-    friend Stack<T>;
-    friend EditHistory;
-    NodeStack() = default;
-    bool operator==(const NodeStack<T>& rhs) const;
-    bool operator!=(const NodeStack<T>& rhs) const;
-    explicit NodeStack(const T& new_value) = delete;
-    NodeStack<T>& operator=(const NodeStack& other) = delete;
-    explicit NodeStack(T&& new_value)
-                        : data(move(new_value)) {}
-
-    ~NodeStack() = default;
-    T operator*();
-private:
-    T data;
-    NodeStack<T>* next;
-};
-
-template <typename T>
-T NodeStack<T>::operator*() {
-    return data;
-}
-
-template<class T>
-bool NodeStack<T>::operator==(const NodeStack<T>& rhs) const {
-    return data == rhs.data;
-}
-
-template<class T>
-bool NodeStack<T>::operator!=(const NodeStack<T>& rhs) const {
-    return data != rhs.data;
-}
-
-template <typename T>
+template<typename T>
 class Stack {
 public:
     Stack() = default;
-    Stack(const Stack<T>& stack);
-    Stack& operator=(const Stack& other);
-    Stack(Stack<T>&& stack) noexcept;
-    Stack& operator=(Stack&& other) noexcept;
-    ~Stack();
-
-    void push(const T& data);
-    void emplace(T&& data);
+    Stack(const Stack& other_);
+    Stack(Stack&& other_)  noexcept = default;
+    ~Stack() = default;
+    Stack& operator=(const Stack& other_);
+    Stack& operator=(Stack&& other_)  noexcept = default;
+    T& top();
     void pop();
+    void push(const T& value_);
+    void push(T&& value_);
+    [[nodiscard]] size_t size() const;
+    [[nodiscard]] bool empty() const;
     void clear();
-    bool empty();
-    [[nodiscard]] unsigned int size() const;
-    const T& getTop() const;
-    T& getTop();
+    //friend std::ostream& operator<<(std::ostream&, const Stack<T>&);
+    //friend std::istream& operator>>(std::istream&, Stack<T>&);
 private:
-    NodeStack<T>* pTop = nullptr;
-    unsigned size_ = 0;
+    void copy(const Stack& other_);
+    class StackElement {
+    public:
+        StackElement() = delete;
+        StackElement(const T& value_, std::unique_ptr<StackElement>&& next_) :
+                m_value{value_}, m_next{std::move(next_)} { }
+        StackElement(T&& value_, std::unique_ptr<StackElement>&& next_) :
+                m_value{std::move(value_)}, m_next{std::move(next_)} { }
+        T& value() { return m_value; }
+        std::unique_ptr<StackElement>& next() { return m_next; }
+    private:
+        T m_value;
+        std::unique_ptr<StackElement> m_next{nullptr};
+    };
+    std::unique_ptr<StackElement> m_top{nullptr};
+    size_t m_size{0};
 };
 
 template<typename T>
-Stack<T>::Stack(const Stack<T>& other_stack) {
-    NodeStack<T>* p;
-    NodeStack<T>* p2;
-    NodeStack<T>* cur;
-
-    pTop = nullptr;
-    cur = nullptr;
-
-    p = other_stack.pTop;
-    while (p != nullptr) {
-        p2 = new NodeStack<T>;
-
-        p2->data = p->data;
-        p2->next = nullptr;
-
-        if (pTop == nullptr) {
-            pTop = p2;
-            cur = p2;
-        } else {
-            cur->next = p2;
-            cur = cur->next;
-        }
-
-        p = p->next;
+void Stack<T>::copy(const Stack& other_) {
+    if (other_.m_top == nullptr) {
+        return;
     }
-    size_ = other_stack.size_;
+    Stack<T> temp;
+    auto t = other_.m_top.get();
+    do {
+        temp.push(t->value());
+        t = t->next().get();
+    } while (t != nullptr);
+    t = temp.m_top.get();
+    do {
+        push(t->value());
+        t = t->next().get();
+    } while (t != nullptr);
 }
 
 template<typename T>
-Stack<T>::Stack(Stack<T>&& stack) noexcept {
-    for (NodeStack<T>* tmp = stack.pTop; tmp != nullptr; tmp = tmp->next) {
-        emplace(std::move(tmp->data));
+Stack<T>::Stack(const Stack& other_) {
+    copy(other_);
+}
+
+template<typename T>
+Stack<T>& Stack<T>::operator=(const Stack& other_) {
+    if (&other_ != this) {
+        clear();
+        copy(other_);
     }
+    return *this;
 }
 
 template<typename T>
-Stack<T>::~Stack() {
-    clear();
-}
-
-template<typename T>
-void Stack<T>::push(const T& data) {
-    NodeStack<T>* p;
-    p = new NodeStack<T>;
-
-    p->data = data;
-    p->next = pTop;
-
-    pTop = p;
-    ++size_;
-}
-
-template <typename T>
-void Stack<T>::emplace(T&& data) {
-    NodeStack<T>* p;
-    p = new NodeStack<T>;
-
-    p->data = std::move(data);
-    p->next = pTop;
-
-    pTop = p;
-    ++size_;
+T& Stack<T>::top() {
+    if (m_top == nullptr) {
+        throw std::out_of_range("top() of empty stack");
+    }
+    return m_top->value();
 }
 
 template<typename T>
 void Stack<T>::pop() {
-    if (pTop == nullptr) {
-        std::cout << "Stack is empty.\n";
-        return;
+    if (m_top != nullptr) {
+        m_top = std::move(m_top->next());
+        --m_size;
     }
-    NodeStack<T>* temp;
-    temp = pTop;
-    pTop = pTop->next;
-    delete temp;
-    --size_;
 }
 
-template <typename T>
+template<typename T>
+void Stack<T>::push(const T& value_) {
+    m_top = std::make_unique<StackElement>(value_, std::move(m_top));
+    ++m_size;
+}
+
+template<typename T>
+void Stack<T>::push(T&& value_) {
+    m_top = std::make_unique<StackElement>(std::move(value_), std::move(m_top));
+    ++m_size;
+}
+
+template<typename T>
+size_t Stack<T>::size() const {
+    return m_size;
+}
+
+template<typename T>
+bool Stack<T>::empty() const {
+    return m_top == nullptr;
+}
+
+template<typename T>
 void Stack<T>::clear() {
-    NodeStack<T>* p;
-    NodeStack<T>* temp;
-
-    p = pTop;
-    while (p != nullptr) {
-        temp = p;
-        p = p->next;
-        delete temp;
-    }
-    pTop = nullptr;
-    size_ = 0;
+    m_top = nullptr;
+    m_size = 0;
 }
 
-template<typename T>
-unsigned int Stack<T>::size() const {
-    return size_;
-}
+//std::ostream& operator<<(std::ostream& stream_, const Stack<int>& stack_) {
+//    if (stack_.m_top == nullptr) {
+//        return stream_;
+//    }
+//    auto p = stack_.m_top.get();
+//    auto s = stack_.size();
+//    stream_.write(reinterpret_cast<char*>(&s), sizeof(s));
+//    stream_ << p->value();
+//    while ((p = p->next().get())) {
+//        stream_ << p->value();
+//    }
+//    return stream_;
+//}
+//
+//template<typename T> std::istream& operator>>(std::istream& stream_, Stack<T>& stack_) {
+//    size_t s;
+//    stream_.read(reinterpret_cast<char*>(&s), sizeof(s));
+//    stack_.clear();
+//    for (size_t i = 0; i < s; ++i) {
+//        T temp;
+//        stream_ >> temp;
+//        stack_.push(temp);
+//    }
+//    return stream_;
+//}
 
-template <typename T>
-bool Stack<T>::empty() {
-    return size_ == 0;
-}
-
-template<typename T>
-const T& Stack<T>::getTop() const {
-    return pTop->data;
-}
-
-template<typename T>
-T& Stack<T>::getTop() {
-//    return const_cast<T&>(const_cast<Stack<T>&>(*this).getTop());
-    return pTop->data;
-}
-
-template<typename T>
-void printStack(const Stack<T>& stack) {
-    if (stack.getTop() == nullptr) {
-        std::cout << "Stack is empty.\n";
-    } else {
-        NodeStack<T>* p;
-        p = stack.getTop();
-        while (p != nullptr) {
-            std::cout << p->data << "\n";
-            p = p->next;
-        }
-        std::cout << '\n';
-    }
-}
-
-template<typename T>
-Stack<T>& Stack<T>::operator=(const Stack& other) {
-    NodeStack<T>* tmp = other.pTop;
-    Stack<T> add;
-    for (size_t i = 0; i < other.size_; ++i) {
-        add.push(tmp->data);
-        tmp = tmp->next;
-    }
-    clear();
-    tmp = add.pTop;
-    for (size_t i = 0; i < other.size_; ++i) {
-        push(tmp->data);
-        tmp = tmp->next;
-    }
-    this->size_ = other.size_;
-    return *this;
-}
-
-template<typename T>
-Stack<T>& Stack<T>::operator=(Stack&& other) noexcept {
-    this->pTop = other.pTop;
-    other.pTop = nullptr;
-    this->size_ = other.size_;
-    return *this;
-}
-
-#endif //LAB_WORK_01_STACK_H
+#endif //STACK_H
