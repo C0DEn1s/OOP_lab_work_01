@@ -1,84 +1,71 @@
 #include "history_revisions.h"
+#include "remove.h"
+#include "insert.h"
+#include "replace.h"
 
-#include <utility>
 
-
-EditHistory::EditHistory() = default;
-
-EditHistory::EditHistory(const Stack <TextEditOperation>& f, const Stack <TextEditOperation>& s, bool flag)
-                        : first(f),
-                          second(s),
-                          was_undo(flag) {}
-
-EditHistory::EditHistory(const EditHistory& other)
-                        : first(other.first),
-                          second(other.second),
-                          was_undo(other.was_undo) {}
-
-EditHistory::~EditHistory() = default;
-
-void EditHistory::insert(std::string s, unsigned pos) {
-    if (was_undo) {
-        second.clear();
-        was_undo = false;
+void EditHistory::remove(unsigned pos, unsigned length_) {
+    if ((pos + length_ > text.size()) || (length_ == 0)) {
+        std::cerr << "Invalid remove\n";
+        return;
     }
-    TextEditOperation in("INSERT", std::move(s), pos);
-    first.push(in);
+    redo_stack.clear();
+    applyOperation(std::make_shared<Remove>(text.substr(pos, length_), pos));
 }
 
-void EditHistory::erase(std::string s, unsigned pos) {
-    if (was_undo) {
-        second.clear();
-        was_undo = false;
+void EditHistory::insert(const std::string& text_, unsigned pos) {
+    if ((pos > text.size()) || text_.empty()) {
+        std::cerr << "Invalid insert\n";
+        return;
     }
-    TextEditOperation in("DELETE", std::move(s), pos);
-    first.push(in);
+    redo_stack.clear();
+    applyOperation(std::make_shared<Insert>(text_, pos));
+}
+
+void EditHistory::replace(const std::string& new_, unsigned pos, size_t length_) {
+    if ((pos + length_ > text.size()) || new_.empty()) {
+        std::cerr << "Invalid replace\n";
+        return;
+    }
+    redo_stack.clear();
+    applyOperation(std::make_shared<Replace>(text.substr(pos, length_), new_, pos));
 }
 
 void EditHistory::undo() {
-    NodeStack<TextEditOperation> p;
-    size_t length = first.size();
-    for (size_t i = 0; i < length; ++i) {
-        second.emplace(std::move(first.getTop()));
-        first.pop();
+    if (undo_stack.empty()) {
+        std::cerr << "Unable to undo\n";
+        return;
     }
-    was_undo = true;
+    auto operation = undo_stack.top();
+    undo_stack.pop();
+    operation->undo(text);
+    redo_stack.push(std::move(operation));
 }
 
 void EditHistory::redo() {
-    NodeStack<TextEditOperation> p;
-    size_t length = second.size();
-    for (size_t i = 0; i < length; ++i) {
-        first.emplace(std::move(second.getTop()));
-        second.pop();
+    if (redo_stack.empty()) {
+        std::cerr << "Unable to redo\n";
+        return;
     }
-    was_undo = true;
+    auto operation = redo_stack.top();
+    redo_stack.pop();
+    operation->apply(text);
+    undo_stack.push(std::move(operation));
 }
 
-unsigned int EditHistory::size() const {
-    return first.size() + second.size();
+bool EditHistory::is_empty_undo() {
+    return undo_stack.empty();
 }
 
-const TextEditOperation& EditHistory::getTopFirst() const {
-    return first.getTop();
+bool EditHistory::is_empty_redo() {
+    return redo_stack.empty();
 }
 
-TextEditOperation& EditHistory::getTopFirst() {
-    return const_cast<TextEditOperation&>(const_cast<const EditHistory&>(*this).getTopFirst());  // first.getTop();
+const std::string& EditHistory::getText() const {
+    return text;
 }
 
-const TextEditOperation& EditHistory::getTopSecond() const {
-    return second.getTop();
-}
-
-TextEditOperation& EditHistory::getTopSecond() {
-    return const_cast<TextEditOperation&>(const_cast<const EditHistory&>(*this).getTopSecond());  // second.getTop();
-}
-
-bool EditHistory::empty_f() {
-    return first.empty();
-}
-
-bool EditHistory::empty_s() {
-    return second.empty();
+void EditHistory::applyOperation(std::shared_ptr<TextOperation>&& operation_) {
+    operation_->apply(text);
+    undo_stack.push(std::move(operation_));
 }
