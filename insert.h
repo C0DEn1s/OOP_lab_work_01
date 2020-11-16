@@ -5,7 +5,7 @@
 
 class Insert : public TextEditOperation {
 public:
-    Insert(const std::string& text_, size_t position_);
+    Insert(const std::string& text_, unsigned pos);
     void apply(std::string& text_) const override;
     void undo(std::string& text_) const override;
 };

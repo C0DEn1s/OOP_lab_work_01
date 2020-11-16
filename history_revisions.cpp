@@ -4,7 +4,7 @@
 #include "replace.h"
 
 
-void EditHistory::remove(unsigned pos, unsigned length_) {
+void EditHistory::remove(unsigned pos, size_t length_) {
     if ((pos + length_ > text.size()) || (length_ == 0)) {
         std::cerr << "Invalid remove\n";
         return;

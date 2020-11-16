@@ -1,7 +1,5 @@
 #include "text_edit_operation.h"
 
-#include <utility>
-
 using namespace std;
 
 TextEditOperation::TextEditOperation(string text_, unsigned pos)

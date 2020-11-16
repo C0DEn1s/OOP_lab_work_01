@@ -12,7 +12,7 @@ public:
 
     void insert(const std::string& text_, unsigned pos);
     void remove(unsigned pos, unsigned length_);
-    void replace(const std::string& new_, size_t position_, unsigned pos);
+    void replace(const std::string& new_, unsigned pos, size_t length_);
     void undo();
     void redo();
 

@@ -5,7 +5,7 @@
 
 class Remove : public TextEditOperation {
 public:
-    Remove(const std::string& text_, size_t position_);
+    Remove(const std::string& text_, unsigned pos);
     void apply(std::string& text_) const override;
     void undo(std::string& text_) const override;
 };
