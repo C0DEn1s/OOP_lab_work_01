@@ -1,7 +1,18 @@
-#include "test.h"
-#include <iostream>
+//#include "test.h"
+//#include <iostream>
+//
+//int main() {
+//    Test();
+//    return 0;
+//}
+#include "mainwindow.h"
 
-int main() {
-    Test();
-    return 0;
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
 }
